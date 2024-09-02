@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Ruído</title>
+</head>
+<body>
+    <h1>Análise de Ruído para Tempo Especial</h1>
+    <form id="analise-form">
+        <div>
+            <label for="periodoInicio">Início do Período:</label>
+            <input type="date" id="periodoInicio" required>
+        </div>
+        <div>
+            <label for="periodoFim">Fim do Período:</label>
+            <input type="date" id="periodoFim" required>
+        </div>
+        <div>
+            <label for="ruido">Nível de Ruído (dB):</label>
+            <input type="number" id="ruido" required>
+        </div>
+        <button type="submit">Analisar</button>
+    </form>
+    <h2>Resultado:</h2>
+    <pre id="resultado"></pre>
+
+    <script>
+        document.getElementById('analise-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const inicio = document.getElementById('periodoInicio').value;
+            const fim = document.getElementById('periodoFim').value;
+            const ruido = parseFloat(document.getElementById('ruido').value);
+            const resultado = [];
+
+            const dataInicio = new Date(inicio);
+            const dataFim = new Date(fim);
+
+            // Até 05/03/1997, ruído acima de 80 dB
+            const marco1 = new Date('1997-03-06');
+            if (dataInicio <= marco1) {
+                const fimPeriodo = dataFim < marco1 ? fim : '1997-03-05';
+                if (ruido > 80) {
+                    resultado.push(`Período ${inicio} a ${fimPeriodo} com ruído de ${ruido} dB está enquadrado como especial (limite 80 dB).`);
+                } else {
+                    resultado.push(`Período ${inicio} a ${fimPeriodo} com ruído de ${ruido} dB não está enquadrado como especial (limite 80 dB).`);
+                }
+                if (dataFim <= marco1) {
+                    document.getElementById('resultado').textContent = resultado.join("\n");
+                    return;
+                }
+            }
+
+            // De 06/03/1997 a 18/11/2003, ruído acima de 90 dB
+            const marco2 = new Date('2003-11-19');
+            if (dataInicio <= marco2 && dataFim >= marco1) {
+                const inicioPeriodo = dataInicio < marco1 ? '1997-03-06' : inicio;
+                const fimPeriodo = dataFim < marco2 ? fim : '2003-11-18';
+                if (ruido > 90) {
+                    resultado.push(`Período ${inicioPeriodo} a ${fimPeriodo} com ruído de ${ruido} dB está enquadrado como especial (limite 90 dB).`);
+                } else {
+                    resultado.push(`Período ${inicioPeriodo} a ${fimPeriodo} com ruído de ${ruido} dB não está enquadrado como especial (limite 90 dB).`);
+                }
+                if (dataFim <= marco2) {
+                    document.getElementById('resultado').textContent = resultado.join("\n");
+                    return;
+                }
+            }
+
+            // A partir de 19/11/2003
